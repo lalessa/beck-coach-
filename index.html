@@ -152,7 +152,18 @@
     <button class="btn" onclick="savePlan()">Save plan</button>
   </div>
   <div class="card">
-    <h2>Share with coach</h2>
+    <h2>Coach sync</h2>
+    <div class="muted">Auto-publishes your data to your GitHub repo after every change, so your Claude coach reads it live at each check-in. Paste a fine-grained GitHub token (Contents: read &amp; write, this repo only). It's stored only on this device.</div>
+    <div style="height:8px"></div>
+    <input type="text" id="ghRepo" placeholder="owner/repo e.g. lalessa/beck-coach-">
+    <div style="height:8px"></div>
+    <input type="text" id="ghTok" placeholder="GitHub token (github_pat_...)">
+    <div style="height:8px"></div>
+    <button class="btn" onclick="saveSync()">Save &amp; sync now</button>
+    <div class="muted" id="syncStatus" style="margin-top:8px"></div>
+  </div>
+  <div class="card">
+    <h2>Share with coach (manual)</h2>
     <div class="muted">Copies a summary of your recent data to paste into your Claude coach chat.</div>
     <div style="height:8px"></div>
     <button class="btn ghost" onclick="exportData()">Copy summary</button>
@@ -173,7 +184,7 @@ const DEF={start:"2026-07-05",day:1,goal:56,mile:63,weights:[{d:"2026-07-05",w:6
 adv:["I put on anything in my closet and walk out without changing three times","I grab something cheap or basic off the rack and it just works — no 'does this hide me?' math","I catch my reflection and feel good, not critical","I say yes — the beach day, the photo, the dance floor — instead of finding excuses","I walk into a room at work or a family gathering feeling attractive and sure of myself"],
 cards:[],checks:{},reads:{},hunger:[],plans:{},flip:false,idx:0};
 let S=JSON.parse(localStorage.getItem("beckCoach")||"null")||DEF;
-const save=()=>localStorage.setItem("beckCoach",JSON.stringify(S));
+const save=()=>{localStorage.setItem("beckCoach",JSON.stringify(S));scheduleSync();};
 const today=()=>new Date().toISOString().slice(0,10);
 const $=id=>document.getElementById(id);
 
@@ -223,6 +234,9 @@ function render(){
   // tools
   $("hList").innerHTML=S.hunger.slice(-8).map(h=>h.t+" — "+h.v+"/10").join("<br>")||"";
   $("planTxt").value=S.plans[today()]||"";
+  $("ghRepo").value=S.ghRepo||"lalessa/beck-coach-";
+  $("ghTok").value=S.ghTok||"";
+  if(!S.ghTok)setSync("Not connected yet.");
 }
 function tick(skill,val){const k=today();S.checks[k]=S.checks[k]||{};S.checks[k][skill]=val;save();render();}
 function addWeight(){const v=parseFloat($("wIn").value);if(!v)return;
@@ -258,6 +272,28 @@ function toggleTimer(){if(tOn){clearInterval(tInt);tOn=false;tLeft=1200;$("tDisp
 function addHunger(){const v=parseInt($("hIn").value);if(isNaN(v))return;
   S.hunger.push({t:new Date().toTimeString().slice(0,5),v});$("hIn").value="";save();render();}
 function savePlan(){S.plans[today()]=$("planTxt").value;save();alert("Plan saved. Decision made — nothing to decide tomorrow.");}
+// --- Coach sync (GitHub) ---
+let syncTimer=null;
+const setSync=m=>{const el=$("syncStatus");if(el)el.textContent=m;};
+function saveSync(){S.ghRepo=$("ghRepo").value.trim();S.ghTok=$("ghTok").value.trim();
+  localStorage.setItem("beckCoach",JSON.stringify(S));pushData();}
+function scheduleSync(){if(!S.ghTok)return;clearTimeout(syncTimer);syncTimer=setTimeout(pushData,4000);}
+async function pushData(){
+  if(!S.ghTok||!S.ghRepo){setSync("Not connected — add repo + token above.");return;}
+  const api="https://api.github.com/repos/"+S.ghRepo+"/contents/data.json";
+  const hdr={Authorization:"Bearer "+S.ghTok,Accept:"application/vnd.github+json"};
+  const payload={day:S.day,goal:S.goal,mile:S.mile,weights:S.weights,adv:S.adv,cards:S.cards,
+    checks:S.checks,reads:S.reads,hunger:S.hunger,plans:S.plans,updated:new Date().toISOString()};
+  const content=btoa(unescape(encodeURIComponent(JSON.stringify(payload,null,1))));
+  try{
+    let sha; const g=await fetch(api,{headers:hdr});
+    if(g.ok) sha=(await g.json()).sha;
+    const r=await fetch(api,{method:"PUT",headers:hdr,
+      body:JSON.stringify({message:"coach sync",content,...(sha?{sha}:{})})});
+    setSync(r.ok?("Synced ✓ "+new Date().toTimeString().slice(0,5)+" — your coach sees the latest."):"Sync failed ("+r.status+") — check token permissions.");
+  }catch(e){setSync("Sync error — offline? Will retry on next change.");}
+}
+
 function exportData(){const ws=S.weights.slice().sort((a,b)=>a.d<b.d?-1:1);
   const txt="Beck app summary — Day "+S.day+" of 42\nWeights: "+ws.slice(-7).map(x=>x.d+" "+x.w).join(", ")
   +"\nToday's checklist: "+Object.entries(S.checks[today()]||{}).filter(x=>x[1]).map(x=>x[0]).join("; ")
