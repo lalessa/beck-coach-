@@ -277,7 +277,8 @@ let syncTimer=null;
 const setSync=m=>{const el=$("syncStatus");if(el)el.textContent=m;};
 function saveSync(){S.ghRepo=$("ghRepo").value.trim();S.ghTok=$("ghTok").value.trim();
   localStorage.setItem("beckCoach",JSON.stringify(S));pushData();}
-function scheduleSync(){if(!S.ghTok)return;clearTimeout(syncTimer);syncTimer=setTimeout(pushData,4000);}
+function scheduleSync(){if(!S.ghTok)return;clearTimeout(syncTimer);syncTimer=setTimeout(pushData,800);}
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&S.ghTok){clearTimeout(syncTimer);pushData();}});
 async function pushData(){
   if(!S.ghTok||!S.ghRepo){setSync("Not connected — add repo + token above.");return;}
   const api="https://api.github.com/repos/"+S.ghRepo+"/contents/data.json";
