@@ -16,9 +16,15 @@
   "I walk into a room at work or a family gathering feeling attractive and sure of myself"
  ],
  "cards": [],
- "checks": {},
- "reads": {},
+ "checks": {
+  "2026-07-05": {
+   "Read advantages list (2×)": true
+  }
+ },
+ "reads": {
+  "2026-07-05": 2
+ },
  "hunger": [],
  "plans": {},
- "updated": "2026-07-05T14:46:07.302Z"
+ "updated": "2026-07-05T14:49:33.848Z"
 }
