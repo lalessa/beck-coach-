@@ -184,7 +184,7 @@ const DEF={start:"2026-07-05",day:1,goal:56,mile:63,weights:[{d:"2026-07-05",w:6
 adv:["I put on anything in my closet and walk out without changing three times","I grab something cheap or basic off the rack and it just works — no 'does this hide me?' math","I catch my reflection and feel good, not critical","I say yes — the beach day, the photo, the dance floor — instead of finding excuses","I walk into a room at work or a family gathering feeling attractive and sure of myself"],
 cards:[],checks:{},reads:{},hunger:[],plans:{},flip:false,idx:0};
 let S=JSON.parse(localStorage.getItem("beckCoach")||"null")||DEF;
-const save=()=>{localStorage.setItem("beckCoach",JSON.stringify(S));scheduleSync();};
+const save=()=>{S.updated=new Date().toISOString();localStorage.setItem("beckCoach",JSON.stringify(S));scheduleSync();};
 const today=()=>new Date().toISOString().slice(0,10);
 const $=id=>document.getElementById(id);
 
@@ -301,6 +301,27 @@ function exportData(){const ws=S.weights.slice().sort((a,b)=>a.d<b.d?-1:1);
   +"\nCards: "+S.cards.length+"\nAdvantages read today: "+(S.reads[today()]||0)+"×";
   navigator.clipboard.writeText(txt).then(()=>alert("Copied — paste it to your coach."));}
 render();
+// --- Pull remote updates (coach-side edits) on open ---
+async function pullData(){
+  try{
+    const repo=S.ghRepo||"lalessa/beck-coach-";
+    const r=await fetch("https://raw.githubusercontent.com/"+repo+"/main/data.json?t="+Date.now());
+    if(!r.ok)return;
+    const d=await r.json();
+    if(!d.updated)return;
+    if(!S.updated||new Date(d.updated)>new Date(S.updated)){
+      ["day","goal","mile","adv","cards"].forEach(k=>{if(d[k]!=null)S[k]=d[k];});
+      (d.weights||[]).forEach(w=>{if(!S.weights.some(x=>x.d===w.d))S.weights.push(w);});
+      ["checks","reads","plans"].forEach(k=>{Object.entries(d[k]||{}).forEach(([dt,v])=>{if(!S[k][dt])S[k][dt]=v;});});
+      (d.hunger||[]).forEach(h=>{if(!S.hunger.some(x=>x.t===h.t&&x.v===h.v))S.hunger.push(h);});
+      S.updated=d.updated;
+      localStorage.setItem("beckCoach",JSON.stringify(S));
+      render();
+    }
+  }catch(e){}
+}
+pullData();
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")pullData();});
 </script>
 </body>
 </html>
