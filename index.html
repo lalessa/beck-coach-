@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Beck Coach</title>
+<style>
+  :root{
+    --bg:#faf7f2; --card:#ffffff; --ink:#2b2620; --sub:#8a8071;
+    --accent:#c2410c; --accent-soft:#fff1e8; --good:#15803d; --good-soft:#e9f6ee;
+    --line:#eee7db; --radius:16px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  body{margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:var(--bg); color:var(--ink); padding-bottom:84px;}
+  header{padding:calc(env(safe-area-inset-top) + 16px) 20px 8px; }
+  h1{font-size:22px; margin:0}
+  .sub{color:var(--sub); font-size:13px; margin-top:2px}
+  .wrap{padding:0 16px}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:16px; margin:12px 0; box-shadow:0 1px 2px rgba(0,0,0,.03)}
+  .card h2{font-size:15px; margin:0 0 10px; display:flex; justify-content:space-between; align-items:center}
+  .pill{background:var(--accent-soft); color:var(--accent); border-radius:99px; padding:3px 10px; font-size:12px; font-weight:600}
+  .task{font-size:15px; line-height:1.45}
+  .daynav{display:flex; align-items:center; gap:10px; margin-top:10px}
+  .daynav button{border:1px solid var(--line); background:#fff; border-radius:10px; padding:6px 14px; font-size:16px}
+  .check{display:flex; align-items:center; gap:12px; padding:11px 4px; border-bottom:1px solid var(--line); font-size:15px}
+  .check:last-child{border-bottom:none}
+  .check input{width:22px; height:22px; accent-color:var(--good)}
+  .check.done label{color:var(--sub); text-decoration:line-through}
+  .row{display:flex; gap:8px}
+  input[type=number],input[type=text],textarea{width:100%; border:1px solid var(--line); border-radius:10px; padding:11px; font-size:16px; background:#fff; color:var(--ink)}
+  textarea{min-height:70px; resize:vertical}
+  .btn{border:none; background:var(--accent); color:#fff; border-radius:10px; padding:12px 16px; font-size:15px; font-weight:600; width:100%}
+  .btn.ghost{background:#fff; color:var(--accent); border:1px solid var(--accent)}
+  .btn.small{width:auto; padding:9px 14px; font-size:14px}
+  .stat{display:flex; gap:8px; text-align:center; margin-bottom:10px}
+  .stat div{flex:1; background:var(--accent-soft); border-radius:12px; padding:10px 4px}
+  .stat b{display:block; font-size:18px}
+  .stat span{font-size:11px; color:var(--sub)}
+  svg{width:100%; height:150px}
+  table{width:100%; border-collapse:collapse; font-size:14px}
+  td,th{padding:7px 4px; border-bottom:1px solid var(--line); text-align:left}
+  .adv{padding:10px 0; border-bottom:1px solid var(--line); font-size:15px; line-height:1.4}
+  .adv:last-child{border:none}
+  .flash{background:var(--ink); color:#fff; border-radius:var(--radius); padding:26px 18px; text-align:center; min-height:130px; display:flex; flex-direction:column; justify-content:center; font-size:16px; line-height:1.5; margin-bottom:10px}
+  .flash .lbl{font-size:11px; letter-spacing:.1em; text-transform:uppercase; opacity:.6; margin-bottom:8px}
+  nav{position:fixed; bottom:0; left:0; right:0; background:rgba(255,255,255,.96); backdrop-filter:blur(8px); border-top:1px solid var(--line); display:flex; padding-bottom:env(safe-area-inset-bottom)}
+  nav button{flex:1; border:none; background:none; padding:10px 0 8px; font-size:11px; color:var(--sub)}
+  nav button.on{color:var(--accent); font-weight:700}
+  nav .ico{display:block; font-size:20px; margin-bottom:2px}
+  .hide{display:none}
+  .timer{font-size:44px; text-align:center; font-variant-numeric:tabular-nums; margin:8px 0}
+  .muted{color:var(--sub); font-size:13px; line-height:1.5}
+  .credit{background:var(--good-soft); color:var(--good); border-radius:10px; padding:10px 12px; font-size:14px; margin-top:10px; display:none}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="hTitle">Beck Coach</h1>
+  <div class="sub" id="hSub"></div>
+</header>
+
+<div class="wrap" id="view-today">
+  <div class="card">
+    <h2>Today's task <span class="pill" id="dayPill"></span></h2>
+    <div class="task" id="dayTask"></div>
+    <div class="daynav">
+      <button onclick="shiftDay(-1)">−</button>
+      <span class="muted">repeat or advance the day</span>
+      <button onclick="shiftDay(1)">+</button>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Daily checklist <span class="pill" id="streakPill"></span></h2>
+    <div id="checks"></div>
+    <div class="credit" id="creditMsg"></div>
+  </div>
+  <div class="card">
+    <h2>Weigh-in</h2>
+    <div class="row">
+      <input type="number" step="0.1" id="wIn" placeholder="Weight today (kg)">
+      <button class="btn small" onclick="addWeight()">Log</button>
+    </div>
+    <div class="muted" style="margin-top:8px">Judge the trend, never the day. ±1 kg overnight is water and noise.</div>
+  </div>
+</div>
+
+<div class="wrap hide" id="view-progress">
+  <div class="card">
+    <h2>Progress</h2>
+    <div class="stat">
+      <div><b id="stNow">–</b><span>current</span></div>
+      <div><b id="stLost">–</b><span>lost</span></div>
+      <div><b id="stGoal">–</b><span>goal</span></div>
+      <div><b id="stMile">–</b><span>next milestone</span></div>
+    </div>
+    <svg id="chart" viewBox="0 0 340 150" preserveAspectRatio="none"></svg>
+    <div class="muted" id="trendTxt"></div>
+  </div>
+  <div class="card">
+    <h2>Weight log</h2>
+    <table id="wTable"><tr><th>Date</th><th>kg</th></tr></table>
+  </div>
+</div>
+
+<div class="wrap hide" id="view-cards">
+  <div class="card">
+    <h2>Response cards <span class="pill" id="cardCount"></span></h2>
+    <div class="flash" id="flash" onclick="flipCard()">
+      <div class="lbl" id="flashLbl">Sabotaging thought — tap to answer</div>
+      <div id="flashTxt">No cards yet. Add the thoughts that get you, with your answers.</div>
+    </div>
+    <button class="btn ghost" onclick="nextCard()">Next card →</button>
+  </div>
+  <div class="card">
+    <h2>Add a card</h2>
+    <input type="text" id="cThought" placeholder='The thought — e.g. "one bite won&#39;t hurt"'>
+    <div style="height:8px"></div>
+    <textarea id="cAnswer" placeholder="Your answer to it"></textarea>
+    <div style="height:8px"></div>
+    <button class="btn" onclick="addCard()">Save card</button>
+  </div>
+  <div class="card">
+    <h2>My advantages — read 2× daily <button class="btn ghost small" onclick="toggleAdvEdit()" id="advEditBtn">Edit</button></h2>
+    <div id="advList"></div>
+    <button class="btn ghost" style="margin-top:10px" onclick="markRead()">I just read them ✓</button>
+    <div class="muted" id="readCount" style="margin-top:8px"></div>
+  </div>
+</div>
+
+<div class="wrap hide" id="view-tools">
+  <div class="card">
+    <h2>Craving timer</h2>
+    <div class="muted">Cravings peak and pass — usually inside 20 minutes. Start the clock, leave the kitchen, let it die on its own.</div>
+    <div class="timer" id="tDisp">20:00</div>
+    <button class="btn" id="tBtn" onclick="toggleTimer()">Start — outlast it</button>
+  </div>
+  <div class="card">
+    <h2>Hunger experiment (Day 12)</h2>
+    <div class="muted">During the one-time delayed-meal experiment, rate the discomfort (0–10) each hour and watch it rise, peak, and fade.</div>
+    <div class="row" style="margin-top:10px">
+      <input type="number" min="0" max="10" id="hIn" placeholder="0–10 right now">
+      <button class="btn small" onclick="addHunger()">Log</button>
+    </div>
+    <div id="hList" class="muted" style="margin-top:10px"></div>
+  </div>
+  <div class="card">
+    <h2>Tomorrow's food plan (from Day 14)</h2>
+    <textarea id="planTxt" placeholder="Write tomorrow's meals now, calmly, on paper — not in front of the food."></textarea>
+    <div style="height:8px"></div>
+    <button class="btn" onclick="savePlan()">Save plan</button>
+  </div>
+  <div class="card">
+    <h2>Share with coach</h2>
+    <div class="muted">Copies a summary of your recent data to paste into your Claude coach chat.</div>
+    <div style="height:8px"></div>
+    <button class="btn ghost" onclick="exportData()">Copy summary</button>
+  </div>
+</div>
+
+<nav>
+  <button id="nav-today" class="on" onclick="show('today')"><span class="ico">☀️</span>Today</button>
+  <button id="nav-progress" onclick="show('progress')"><span class="ico">📈</span>Progress</button>
+  <button id="nav-cards" onclick="show('cards')"><span class="ico">🗂️</span>Cards</button>
+  <button id="nav-tools" onclick="show('tools')"><span class="ico">🧰</span>Tools</button>
+</nav>
+
+<script>
+const TASKS=["Record the advantages of losing weight","Pick two reasonable diets (primary + backup)","Eat everything sitting down","Give yourself credit","Eat slowly and mindfully","Find a diet coach","Arrange your environment","Create time and energy for dieting","Select an exercise plan","Set a realistic goal (small increments)","Differentiate hunger, desire and cravings","Practice hunger tolerance","Overcome cravings","Plan for tomorrow — written food plan","Start your diet & monitor your eating","Prevent unplanned eating — no choice","End overeating — stop at your portion","Change your definition of full","Stop fooling yourself","Get back on track — the lapse rules","Get ready to weigh in","Say 'oh well' to disappointment","Counter the unfairness syndrome","Deal with discouragement","Identify your sabotaging thoughts","Recognize thinking mistakes","Master the seven-question technique","Weigh-in week 4","Resist food pushers","Stay in control eating out","Decide about drinking","Prepare for travel","Eliminate emotional eating","Solve problems","Weigh-in week 5","Believe it","Reduce stress","Deal with a plateau","Keep up with exercise","Enrich your life","Make a new to-do list","Practice, practice, practice"];
+const SKILLS=[["Read advantages list (2×)",1],["Ate everything sitting down",3],["Gave myself credit",4],["Ate slowly and mindfully",5],["Environment kept safe",7],["Exercise done",9],["Tolerated hunger/craving without giving in",12],["Wrote tomorrow's food plan",14],["Ate only what I planned",15],["Stopped at planned portions",17],["Read response cards",22]];
+const DEF={start:"2026-07-05",day:1,goal:56,mile:63,weights:[{d:"2026-07-05",w:65}],
+adv:["I put on anything in my closet and walk out without changing three times","I grab something cheap or basic off the rack and it just works — no 'does this hide me?' math","I catch my reflection and feel good, not critical","I say yes — the beach day, the photo, the dance floor — instead of finding excuses","I walk into a room at work or a family gathering feeling attractive and sure of myself"],
+cards:[],checks:{},reads:{},hunger:[],plans:{},flip:false,idx:0};
+let S=JSON.parse(localStorage.getItem("beckCoach")||"null")||DEF;
+const save=()=>localStorage.setItem("beckCoach",JSON.stringify(S));
+const today=()=>new Date().toISOString().slice(0,10);
+const $=id=>document.getElementById(id);
+
+function show(v){["today","progress","cards","tools"].forEach(x=>{$("view-"+x).classList.toggle("hide",x!==v);$("nav-"+x).classList.toggle("on",x===v);});render();}
+function shiftDay(n){S.day=Math.min(42,Math.max(1,S.day+n));save();render();}
+
+function render(){
+  $("dayPill").textContent="Day "+S.day+" of 42";
+  $("dayTask").textContent=TASKS[S.day-1];
+  $("hSub").textContent="Week "+Math.ceil(S.day/7)+" · goal "+S.goal+" kg";
+  // checklist
+  const done=S.checks[today()]||{};
+  const unlocked=SKILLS.filter(s=>s[1]<=S.day);
+  $("checks").innerHTML=unlocked.map((s,i)=>{
+    const c=done[s[0]]?"checked":"";
+    return `<div class="check ${c?'done':''}"><input type="checkbox" id="ck${i}" ${c} onchange="tick('${s[0].replace(/'/g,"\\'")}',this.checked)"><label for="ck${i}">${s[0]}</label></div>`;
+  }).join("");
+  const nDone=Object.values(done).filter(Boolean).length;
+  $("creditMsg").style.display=nDone?"block":"none";
+  $("creditMsg").textContent="Credit ✓ — "+nDone+" skill"+(nDone>1?"s":"")+" practiced today. That's the program working.";
+  // streak
+  let st=0,d=new Date();
+  for(;;){const k=d.toISOString().slice(0,10);if(S.checks[k]&&Object.values(S.checks[k]).some(Boolean)){st++;d.setDate(d.getDate()-1);}else break;}
+  $("streakPill").textContent=st+"-day streak";
+  // progress
+  const ws=S.weights.slice().sort((a,b)=>a.d<b.d?-1:1);
+  const now=ws[ws.length-1].w, first=ws[0].w;
+  $("stNow").textContent=now; $("stGoal").textContent=S.goal;
+  $("stLost").textContent=(first-now).toFixed(1); $("stMile").textContent=S.mile;
+  if(now<=S.mile&&S.mile>S.goal){S.mile=Math.max(S.goal,S.mile-2);save();}
+  $("wTable").innerHTML="<tr><th>Date</th><th>kg</th></tr>"+ws.slice(-14).reverse().map(x=>`<tr><td>${x.d}</td><td>${x.w}</td></tr>`).join("");
+  drawChart(ws);
+  // trend text
+  if(ws.length>=4){const half=Math.floor(ws.length/2);
+    const a=ws.slice(0,half).reduce((s,x)=>s+x.w,0)/half, b=ws.slice(half).reduce((s,x)=>s+x.w,0)/(ws.length-half);
+    $("trendTxt").textContent=b<a?("Trending down "+(a-b).toFixed(1)+" kg (recent avg vs earlier avg). On your way."):"Trend flat so far — normal early on. Judge the month.";
+  } else $("trendTxt").textContent="Log a few weigh-ins and the trend appears here.";
+  // cards & advantages
+  $("cardCount").textContent=S.cards.length+" cards";
+  $("advList").innerHTML=S.adv.map((a,i)=>advEdit
+    ?`<div class="adv" onclick="editAdvItem(${i})">${i+1}. ${a} <span style="color:#c2410c;font-weight:700;float:right" onclick="delAdvItem(${i},event)">✕</span></div>`
+    :`<div class="adv">${i+1}. ${a}</div>`).join("")
+    +(advEdit?`<div class="adv" style="color:#c2410c;font-weight:600" onclick="addAdvItem()">＋ Add a reason</div>`:"");
+  const r=S.reads[today()]||0;
+  $("readCount").textContent=r?("Read "+r+"× today "+(r>=2?"— done ✓":"— once more")):"Not read yet today.";
+  showCard();
+  // tools
+  $("hList").innerHTML=S.hunger.slice(-8).map(h=>h.t+" — "+h.v+"/10").join("<br>")||"";
+  $("planTxt").value=S.plans[today()]||"";
+}
+function tick(skill,val){const k=today();S.checks[k]=S.checks[k]||{};S.checks[k][skill]=val;save();render();}
+function addWeight(){const v=parseFloat($("wIn").value);if(!v)return;
+  const k=today();S.weights=S.weights.filter(x=>x.d!==k);S.weights.push({d:k,w:v});$("wIn").value="";save();render();}
+function drawChart(ws){const svg=$("chart");if(ws.length<2){svg.innerHTML="";return;}
+  const w=340,h=150,p=14;const vals=ws.map(x=>x.w).concat([S.goal]);
+  const mn=Math.min(...vals)-.5,mx=Math.max(...vals)+.5;
+  const X=i=>p+i*(w-2*p)/(ws.length-1),Y=v=>h-p-(v-mn)*(h-2*p)/(mx-mn);
+  const pts=ws.map((x,i)=>X(i)+","+Y(x.w)).join(" ");
+  svg.innerHTML=`<line x1="${p}" y1="${Y(S.goal)}" x2="${w-p}" y2="${Y(S.goal)}" stroke="#15803d" stroke-dasharray="4 4" stroke-width="1.5"/>
+  <text x="${w-p}" y="${Y(S.goal)-5}" font-size="10" fill="#15803d" text-anchor="end">goal ${S.goal}</text>
+  <polyline points="${pts}" fill="none" stroke="#c2410c" stroke-width="2.5" stroke-linecap="round"/>` +
+  ws.map((x,i)=>`<circle cx="${X(i)}" cy="${Y(x.w)}" r="3.5" fill="#c2410c"/>`).join("");}
+function addCard(){const t=$("cThought").value.trim(),a=$("cAnswer").value.trim();if(!t||!a)return;
+  S.cards.push({t,a});$("cThought").value="";$("cAnswer").value="";save();render();}
+function showCard(){if(!S.cards.length)return;const c=S.cards[S.idx%S.cards.length];
+  $("flashLbl").textContent=S.flip?"Your answer":"Sabotaging thought — tap to answer";
+  $("flashTxt").textContent=S.flip?c.a:'"'+c.t+'"';}
+function flipCard(){if(!S.cards.length)return;S.flip=!S.flip;save();showCard();}
+function nextCard(){S.idx++;S.flip=false;save();showCard();}
+function markRead(){const k=today();S.reads[k]=(S.reads[k]||0)+1;save();render();}
+let advEdit=false;
+function toggleAdvEdit(){advEdit=!advEdit;$("advEditBtn").textContent=advEdit?"Done":"Edit";render();}
+function editAdvItem(i){const v=prompt("Edit this reason:",S.adv[i]);if(v&&v.trim()){S.adv[i]=v.trim();save();render();}}
+function delAdvItem(i,ev){ev.stopPropagation();if(confirm("Remove this reason?")){S.adv.splice(i,1);save();render();}}
+function addAdvItem(){const v=prompt("New reason — make it specific:");if(v&&v.trim()){S.adv.push(v.trim());save();render();}}
+let tLeft=1200,tOn=false,tInt=null;
+function toggleTimer(){if(tOn){clearInterval(tInt);tOn=false;tLeft=1200;$("tDisp").textContent="20:00";$("tBtn").textContent="Start — outlast it";return;}
+  tOn=true;$("tBtn").textContent="Give up the timer (not the plan)";
+  tInt=setInterval(()=>{tLeft--;
+    $("tDisp").textContent=String(Math.floor(tLeft/60)).padStart(2,"0")+":"+String(tLeft%60).padStart(2,"0");
+    if(tLeft<=0){clearInterval(tInt);tOn=false;tLeft=1200;$("tDisp").textContent="You outlasted it 💪";$("tBtn").textContent="Start again";}},1000);}
+function addHunger(){const v=parseInt($("hIn").value);if(isNaN(v))return;
+  S.hunger.push({t:new Date().toTimeString().slice(0,5),v});$("hIn").value="";save();render();}
+function savePlan(){S.plans[today()]=$("planTxt").value;save();alert("Plan saved. Decision made — nothing to decide tomorrow.");}
+function exportData(){const ws=S.weights.slice().sort((a,b)=>a.d<b.d?-1:1);
+  const txt="Beck app summary — Day "+S.day+" of 42\nWeights: "+ws.slice(-7).map(x=>x.d+" "+x.w).join(", ")
+  +"\nToday's checklist: "+Object.entries(S.checks[today()]||{}).filter(x=>x[1]).map(x=>x[0]).join("; ")
+  +"\nCards: "+S.cards.length+"\nAdvantages read today: "+(S.reads[today()]||0)+"×";
+  navigator.clipboard.writeText(txt).then(()=>alert("Copied — paste it to your coach."));}
+render();
+</script>
+</body>
+</html>
