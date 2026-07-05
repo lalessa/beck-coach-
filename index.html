@@ -284,7 +284,8 @@ async function pushData(){
   const api="https://api.github.com/repos/"+S.ghRepo+"/contents/data.json";
   const hdr={Authorization:"Bearer "+S.ghTok,Accept:"application/vnd.github+json"};
   const payload={day:S.day,goal:S.goal,mile:S.mile,weights:S.weights,adv:S.adv,cards:S.cards,
-    checks:S.checks,reads:S.reads,hunger:S.hunger,plans:S.plans,updated:new Date().toISOString()};
+    checks:S.checks,reads:S.reads,hunger:S.hunger,plans:S.plans,
+    diets:S.diets||null,notes:S.notes||[],updated:new Date().toISOString()};
   const content=btoa(unescape(encodeURIComponent(JSON.stringify(payload,null,1))));
   try{
     let sha; const g=await fetch(api,{headers:hdr});
@@ -310,7 +311,7 @@ async function pullData(){
     const d=await r.json();
     if(!d.updated)return;
     if(!S.updated||new Date(d.updated)>new Date(S.updated)){
-      ["day","goal","mile","adv","cards"].forEach(k=>{if(d[k]!=null)S[k]=d[k];});
+      ["day","goal","mile","adv","cards","diets","notes"].forEach(k=>{if(d[k]!=null)S[k]=d[k];});
       (d.weights||[]).forEach(w=>{if(!S.weights.some(x=>x.d===w.d))S.weights.push(w);});
       ["checks","reads","plans"].forEach(k=>{Object.entries(d[k]||{}).forEach(([dt,v])=>{if(!S[k][dt])S[k][dt]=v;});});
       (d.hunger||[]).forEach(h=>{if(!S.hunger.some(x=>x.t===h.t&&x.v===h.v))S.hunger.push(h);});
