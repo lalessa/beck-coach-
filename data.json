@@ -58,11 +58,12 @@
   }
  },
  "reads": {
-  "2026-07-05": 2
+  "2026-07-05": 2,
+  "2026-07-06": 1
  },
  "hunger": [],
  "plans": {},
- "updated": "2026-07-07T07:41:47.399855Z",
+ "updated": "2026-07-07T07:53:56.420022Z",
  "diets": {
   "primary": "Ten-day chef rotation (~1,550–1,590 kcal/day incl. breakfast). Rule: anything beyond the rotation must be planned in advance or it doesn't happen.",
   "backup": "Plate method: half vegetables, quarter protein, quarter carb, water. For travel, restaurants, family spreads.",
