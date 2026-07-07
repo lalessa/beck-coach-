@@ -21,15 +21,35 @@
  "cards": [
   {
    "t": "I deserve it",
-   "a": "I do deserve a reward — the one I actually want: wearing anything and looking amazing, passing the mirror and feeling good. A dessert I didn't plan takes that away from me; it doesn't give me anything I'll still want in ten minutes."
+   "a": "Latifah, that thought is a permission slip your brain printed after the craving already existed. That's all licensing is: a justification so eating won't feel like breaking your rule. You do deserve something, just not this. The reward you actually want is wearing whatever and looking amazing. The craving peaks and dies in ten minutes either way. Make tea and outlast it."
+  },
+  {
+   "t": "I've been so good, I can have a bit",
+   "a": "That's moral licensing. Your brain is treating being on plan like credit it can spend. It can't. The people who keep losing read success as \"protect the streak,\" the ones who regain read it as \"earned a treat.\" Same fact, two frames. You worked for this. Don't spend it on a bite. Leave the kitchen."
+  },
+  {
+   "t": "It's just a hundred calories",
+   "a": "Your brain is minimizing, and it's right about today: 100 calories is nothing. It's lying about the pattern: 100 extra a day is about 5 kg a year, and every yes makes the next yes easier. You're not deciding about a bite, you're training a reflex. Close it and go."
   },
   {
    "t": "It's my period, whatever",
-   "a": "My period makes the craving louder — it doesn't make calories not count. I can be uncomfortable and on plan at the same time. This is exactly the rep that builds the muscle."
+   "a": "The hunger is real. Luteal phase intake genuinely runs higher, that's measured. But watch what \"whatever\" does: it takes a real signal and turns it into blanket permission. The signal gets a response, not surrender. This week needs more rules, not less. Tea, list, ten minutes."
   },
   {
    "t": "I'll start tomorrow",
-   "a": "There is no tomorrow-me with a different brain. The start is always now — this bite, this choice. The body that wears anything is bought in moments exactly like this one."
+   "a": "This one's studied: dieters who plan to restrict tomorrow eat MORE today. \"Tomorrow\" isn't rest, it's a license to eat now. There's no tomorrow version of you with a different brain. The next action is the only real thing. Do it now."
+  },
+  {
+   "t": "After a lapse — \"eat whatever now, start again tomorrow\"",
+   "a": "The danger isn't what you ate. It's the guilt spiral after, the abstinence violation effect: guilt reads one lapse as total failure, and THAT causes the binge. The bite cost 200 calories. \"Screw it\" costs thousands. Okay, you ate it. One moment, not the day. No drama. Next meal, back on plan. Done."
+  },
+  {
+   "t": "After a fight — \"whatever\"",
+   "a": "This is not hunger. Your nervous system is holding a charge with nowhere to go and the mouth is the nearest exit. You proved it yourself: gum handled the urge fine until the fight showed up. Eating buries the charge in your body. Movement spends it. Gum, walk two minutes, voice-note the anger. Then decide."
+  },
+  {
+   "t": "I'm too tired / stressed for this today",
+   "a": "Tired brains grab the default, that's real. So the plan shrinks instead of pausing: sit, eat, read one card. You can do that exhausted. And a rep done tired rewires harder than ten done fresh, because tired is when the old pattern usually wins. That counts double."
   }
  ],
  "checks": {
@@ -38,11 +58,11 @@
   }
  },
  "reads": {
-  "2026-07-05": 2,
-  "2026-07-06": 1
+  "2026-07-05": 2
  },
  "hunger": [],
  "plans": {},
+ "updated": "2026-07-07T07:41:47.399855Z",
  "diets": {
   "primary": "Ten-day chef rotation (~1,550–1,590 kcal/day incl. breakfast). Rule: anything beyond the rotation must be planned in advance or it doesn't happen.",
   "backup": "Plate method: half vegetables, quarter protein, quarter carb, water. For travel, restaurants, family spreads.",
@@ -51,6 +71,5 @@
  "notes": [
   "2026-07-05: Craving caught and beaten — dessert, 'I deserve it' thought, did not eat. First response card created from it.",
   "Pacing: one program day per calendar day; Day 4 = 2026-07-08. July 6–7 rehearsal: list 2x, cards 1x, every bite seated."
- ],
- "updated": "2026-07-06T19:54:01.013Z"
+ ]
 }
