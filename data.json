@@ -1,11 +1,27 @@
 {
- "day": 3,
+ "day": 7,
  "goal": 56,
  "mile": 63,
  "weights": [
   {
    "d": "2026-07-05",
    "w": 65
+  },
+  {
+   "d": "2026-07-06",
+   "w": 65
+  },
+  {
+   "d": "2026-07-07",
+   "w": 65.6
+  },
+  {
+   "d": "2026-07-10",
+   "w": 65
+  },
+  {
+   "d": "2026-07-12",
+   "w": 67
   }
  ],
  "adv": [
@@ -55,15 +71,28 @@
  "checks": {
   "2026-07-05": {
    "Read advantages list (2×)": true
+  },
+  "2026-07-06": {
+   "Read advantages list (2×)": true,
+   "Ate everything sitting down": true
+  },
+  "2026-07-07": {
+   "Read advantages list (2×)": true,
+   "Ate everything sitting down": true
+  },
+  "2026-07-09": {
+   "Ate everything sitting down": true
   }
  },
  "reads": {
   "2026-07-05": 2,
-  "2026-07-06": 1
+  "2026-07-06": 1,
+  "2026-07-07": 1,
+  "2026-07-09": 1,
+  "2026-07-10": 1
  },
  "hunger": [],
  "plans": {},
- "updated": "2026-07-07T07:53:56.420022Z",
  "diets": {
   "primary": "Ten-day chef rotation (~1,550–1,590 kcal/day incl. breakfast). Rule: anything beyond the rotation must be planned in advance or it doesn't happen.",
   "backup": "Plate method: half vegetables, quarter protein, quarter carb, water. For travel, restaurants, family spreads.",
@@ -72,5 +101,6 @@
  "notes": [
   "2026-07-05: Craving caught and beaten — dessert, 'I deserve it' thought, did not eat. First response card created from it.",
   "Pacing: one program day per calendar day; Day 4 = 2026-07-08. July 6–7 rehearsal: list 2x, cards 1x, every bite seated."
- ]
+ ],
+ "updated": "2026-07-12T14:46:05.960Z"
 }
